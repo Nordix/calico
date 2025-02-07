@@ -895,6 +895,23 @@ spec:
                   when set to false. This reduces the number of metrics reported,
                   reducing Prometheus load. [Default: true]'
                 type: boolean
+              metricsTLSEnabled:
+                description: |-
+                  Enables TLS encryption for the /metrics endpoint. If set to true, the metrics server will only be accessible over HTTPS. [Default: false]
+                type: boolean
+              metricsTLSCACertFile:
+                description: |-
+                  MetricsTLSCACertFile defines the absolute path to the TLS CA certificate file used for securing the /metrics endpoint.
+                  This certificate must be valid and accessible by the calico-node process.
+                type: string
+              metricsTLSCertFile:
+                description: |-
+                  Specifies the absolute file path to the TLS certificate used for securing the /metrics endpoint. This certificate must be valid and accessible by the calico-node process.
+                type: string
+              metricsTLSPrivateKeyFile:
+                description: |-
+                  Specifies the absolute file path to the private key corresponding to the TLS certificate used for securing the /metrics endpoint. The private key must be valid and accessible by the calico-node process.
+                type: string
               removeExternalRoutes:
                 description: RemoveExternalRoutes Controls whether Felix will remove
                   unexpected routes to workload interfaces. Felix will always clean

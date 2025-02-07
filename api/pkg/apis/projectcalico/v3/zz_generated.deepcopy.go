@@ -1322,6 +1322,26 @@ func (in *FelixConfigurationSpec) DeepCopyInto(out *FelixConfigurationSpec) {
 		*out = new(bool)
 		**out = **in
 	}
+	if in.MetricsTLSEnabled != nil {
+		in, out := &in.MetricsTLSEnabled, &out.MetricsTLSEnabled
+		*out = new(bool)
+		**out = **in
+	}
+	if in.MetricsTLSCACertFile != nil {
+		in, out := &in.MetricsTLSCACertFile, &out.MetricsTLSCACertFile
+		*out = new(string)
+		**out = **in
+	}
+	if in.MetricsTLSCertFile != nil {
+		in, out := &in.MetricsTLSCertFile, &out.MetricsTLSCertFile
+		*out = new(string)
+		**out = **in
+	}
+	if in.MetricsTLSPrivateKeyFile != nil {
+		in, out := &in.MetricsTLSPrivateKeyFile, &out.MetricsTLSPrivateKeyFile
+		*out = new(string)
+		**out = **in
+	}
 	if in.FailsafeInboundHostPorts != nil {
 		in, out := &in.FailsafeInboundHostPorts, &out.FailsafeInboundHostPorts
 		*out = new([]ProtoPort)

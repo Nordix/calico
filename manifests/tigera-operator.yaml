@@ -1611,6 +1611,28 @@ spec:
                   set up a NAT rule, from 169.254.169.254:80 to MetadataAddr:MetadataPort.
                   In most cases this should not need to be changed [Default: 8775].'
                 type: integer
+              metricsTLSCACertFile:
+                description: MetricsTLSCACertFile defines the absolute path to the
+                  TLS CA certificate file used for securing the /metrics endpoint.
+                  This certificate must be valid and accessible by the calico-node
+                  process.
+                type: string
+              metricsTLSCertFile:
+                description: MetricsTLSCertFile defines the absolute path to the TLS
+                  certificate file used for securing the /metrics endpoint. This certificate
+                  must be valid and accessible by the calico-node process.
+                type: string
+              metricsTLSEnabled:
+                description: MetricsTLSEnabled specifies whether TLS encryption is
+                  enabled for the /metrics endpoint. If set to true, the metrics server
+                  will only be accessible over HTTPS. Default is false.
+                type: boolean
+              metricsTLSPrivateKeyFile:
+                description: MetricsTLSPrivateKeyFile defines the absolute path to
+                  the private key file corresponding to the TLS certificate used for
+                  securing the /metrics endpoint. The private key must be valid and
+                  accessible by the calico-node process.
+                type: string
               mtuIfacePattern:
                 description: MTUIfacePattern is a regular expression that controls
                   which interfaces Felix should scan in order to calculate the host's
@@ -6745,6 +6767,10 @@ spec:
                                   If omitted, the API server Deployment will use its default value for nodeSelector.
                                   WARNING: Please note that this field will modify the default API server Deployment nodeSelector.
                                 type: object
+                              priorityClassName:
+                                description: PriorityClassName allows to specify a
+                                  PriorityClass resource to be used.
+                                type: string
                               tolerations:
                                 description: |-
                                   Tolerations is the API server pod's tolerations.

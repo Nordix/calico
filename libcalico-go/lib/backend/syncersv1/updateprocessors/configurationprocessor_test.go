@@ -43,7 +43,11 @@ const (
 )
 
 const (
+<<<<<<< HEAD
 	numBaseFelixConfigs = 170
+=======
+	numBaseFelixConfigs = 172
+>>>>>>> dc4a3a88f8 (Add PrometheusMetricsClientAuthType and kubebuilder validation for it)
 )
 
 var _ = Describe("Test the generic configuration update processor and the concrete implementations", func() {

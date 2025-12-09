@@ -103,6 +103,7 @@ func (r *DefaultRuleRenderer) WorkloadInterfaceAllowChains(
 			return r.Allow()
 		},
 		endRules,
+		false,
 	)
 	chains = append(chains, toChildChains...)
 	chains = append(chains, toRootChain)
@@ -315,6 +316,7 @@ func (r *DefaultRuleRenderer) interfaceNameDispatchChains(
 				return r.GoTo(EndpointChainName(pfx, name, r.maxNameLength))
 			},
 			fromEndRules,
+			false,
 		)
 		chains = append(chains, fromChildChains...)
 		chains = append(chains, fromRootChain)
@@ -333,6 +335,7 @@ func (r *DefaultRuleRenderer) interfaceNameDispatchChains(
 				return r.GoTo(EndpointChainName(pfx, name, r.maxNameLength))
 			},
 			toEndRules,
+			false,
 		)
 		chains = append(chains, toChildChains...)
 		chains = append(chains, toRootChain)
@@ -363,7 +366,7 @@ func (r *DefaultRuleRenderer) endpointMarkDispatchChains(
 
 	// The workload and host endpoint share the same root chain. We also need to put an non-cali mark rules at the end.
 	// Work out child chains and root rules for workload and host endpoint separately and merge them back together.
-	for _, names := range [][]string{wlNames, hepNames} {
+	for index, names := range [][]string{wlNames, hepNames} {
 		if len(names) > 0 {
 			commonPrefix, prefixes, prefixToNames := r.sortAndDivideEndpointNamesToPrefixTree(names)
 
@@ -378,6 +381,7 @@ func (r *DefaultRuleRenderer) endpointMarkDispatchChains(
 					return r.GoTo(EndpointChainName(pfx, name, r.maxNameLength))
 				},
 				nil,
+				(index == 1),
 			)
 
 			chains = append(chains, childChains...)
@@ -468,6 +472,7 @@ func (r *DefaultRuleRenderer) buildSingleDispatchChains(
 	getMatchForEndpoint func(name string) generictables.MatchCriteria,
 	getActionForEndpoint func(pfx, name string) generictables.Action,
 	endRules []generictables.Rule,
+	extendChainName bool,
 ) ([]*generictables.Chain, *generictables.Chain, []generictables.Rule) {
 	if r.NFTables && (endpointPfx == WorkloadFromEndpointPfx || endpointPfx == WorkloadToEndpointPfx) {
 		// Currently only supported for nftables workload endpoint dispatch.
@@ -486,6 +491,7 @@ func (r *DefaultRuleRenderer) buildSingleDispatchChains(
 		getMatchForEndpoint,
 		getActionForEndpoint,
 		endRules,
+		extendChainName,
 	)
 }
 
@@ -500,6 +506,7 @@ func (r *DefaultRuleRenderer) buildSingleDispatchChainTree(
 	getMatchForEndpoint func(name string) generictables.MatchCriteria,
 	getActionForEndpoint func(pfx, name string) generictables.Action,
 	endRules []generictables.Rule,
+	extendChainName bool,
 ) ([]*generictables.Chain, *generictables.Chain, []generictables.Rule) {
 	childChains := make([]*generictables.Chain, 0)
 	rootRules := make([]generictables.Rule, 0)
@@ -519,6 +526,15 @@ func (r *DefaultRuleRenderer) buildSingleDispatchChainTree(
 			nextChar := prefix[len(commonPrefix):]
 			ifaceMatch := prefix + r.wildcard
 			childChainName := chainName + "-" + nextChar
+			// If requested, extend the chain name with an additional character. This
+			// fixes the chain naming collision in case chains are constructed in
+			// more than a single pass. In that case, interfaces like caliX... and
+			// named like caliX... end up in the same chain than interfaces that start
+			// with the same character X. In this case rules generated in the previous
+			// round are overwritten by the new ones.
+			if extendChainName == true {
+				childChainName += "x"
+			}
 			logCxt := logCxt.WithFields(log.Fields{
 				"childChainName": childChainName,
 				"ifaceMatch":     ifaceMatch,
